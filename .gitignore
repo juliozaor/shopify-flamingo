@@ -1,0 +1,11 @@
+node_modules
+build
+coverage
+archivos
+.vscode
+.DS_STORE
+tmp
+.scannerwork
+.nyc_output
+.package-lock.json
+.env

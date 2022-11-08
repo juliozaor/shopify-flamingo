@@ -1,0 +1,20 @@
+FROM node:16.14.0
+WORKDIR /app
+COPY package*.json /app/
+COPY .env /app/
+COPY . .
+RUN npm install --production 
+RUN npm install -g @adonisjs/cli
+RUN npm install @adonisjs/ace@5.1.0 --save
+RUN node ace invoke adonis5-swagger
+RUN node ace build 
+ENV HOST=0.0.0.0
+ENV PORT=80
+ENV NODE_ENV=production
+ENV APP_URL=http://${HOST}:${PORT}
+ENV CACHE_VIEWS=false
+ENV APP_KEY=vUwu_rfzSm8Lq-O_nX7BtNm1Niw8fMkb
+ENV HASH_DRIVER=bcrypt
+
+EXPOSE 80
+CMD [ "node", "ace", "serve" ]

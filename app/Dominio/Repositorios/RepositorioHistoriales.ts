@@ -1,4 +1,5 @@
 
 export interface RepositorioHistoriales{
-    historial(parametros: string): Promise<string>
+    guardarShopify(parametros: string): Promise<any>
+    guardarVtex(parametros: string): Promise<any>
 }

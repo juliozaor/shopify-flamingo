@@ -11,12 +11,19 @@ private servicio: ServicioHistorial;
     
    
 
-    public async guardar({ request }: HttpContextContract) {
+    public async guardarShopify({ request }: HttpContextContract) {
         const informacion = request.raw();
       const formateoUno = informacion?.replace('note":""', 'note":"')
       const formateoDos = formateoUno?.replace(']"","note', ']","note')
 
-            return await this.servicio.historial(JSON.stringify(formateoDos))
+            return await this.servicio.guardarShopify(JSON.stringify(formateoDos))
+      
+    }
+
+    public async guardarVtex({ request }) {
+        const datos= request.all();
+        
+         return await this.servicio.guardarVtex(JSON.stringify(datos))
       
     }
 

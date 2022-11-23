@@ -13,17 +13,12 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         const ventas = JSON.parse(primeraConversion)
 
         if (ventas.note) {
-            const notas = JSON.parse(ventas.note);
-            let correos = new Array();
-
-            // si note es vacia o null nmo se manda nada
-
             const productos = ventas.line_items.map(producto => {
                 return producto.name
             })
 
-            notas.map(nota => {
-                correos.push(nota.em)
+            let correos = await JSON.parse(ventas.note).map(marca => {
+                return marca.em
             })
 
             const venta = {
@@ -50,55 +45,80 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async guardarVtex(datos: string): Promise<any> {
 
-        const informacion= JSON.parse(datos);
+        const informacion = JSON.parse(datos);
         let appToken = 'TKWHNENHKDJWALUYZQVEWWJRWUAZYKYVTDZMKDUALUJOMITQAPOGAJJSVGBQAIYNXENLHVBPUWNDUVDGYVDIXCYFOOBREPAWDRNXNCONGMZGGDPDGNXPKTXKMSYGEXJL';
         const appKey = 'vtexappkey-flamingoqa-ATGJND';
-        if( informacion.Origin ){
-          //  TODO: Consultar el token
+        if (informacion.Origin) {
+            //  TODO: Consultar el token
 
 
-            if( appToken != ''){
+            if (appToken != '') {
                 const orderId = informacion.OrderId;
 
                 const configuracion = {
-                    headers:{
-                      'X-VTEX-API-AppKey':appKey,
-                      'X-VTEX-API-AppToken':appToken
+                    headers: {
+                        'X-VTEX-API-AppKey': appKey,
+                        'X-VTEX-API-AppToken': appToken
                     }
-                  };
+                };
 
                 const navegacion = await axios.get(Env.get('VTEX') + `/${orderId}`, configuracion).then((resultado) => {
                     return resultado.data
-                }).catch((err) => {                    
+                }).catch((err) => {
                     return null
                 })
 
+                // return navegacion.customData.customApps[0].fields.aliados
                 // Validar la informacion para sacar los datos
-                if(navegacion){
+                if (navegacion && navegacion.customData) {
+                    const marcacion = navegacion.customData.customApps[0].fields.aliados;
+                    let valorTotal;
+                    let flete;
+                    let correos = await JSON.parse(marcacion).map(marca => {
+                        return marca.em
+                    })
+                    await navegacion.totals.map(total => {
+                        if (total.id == 'Items') {
+                            valorTotal = total.value.toString();
+                        }
+                        if (total.id == 'Shipping') {
+                            flete = total.value.toString();
+                        }
+                    })
+                    const productos = await navegacion.items.map(item => {
+                        return item.name
+                    })
+
+
                     const venta = {
                         id: uuidAPIKey.create().uuid,
                         ordenCompra: navegacion.orderId,
                         fechaOrden: navegacion.creationDate,
-                        marcacion: navegacion.note,
-                        valorTotal: navegacion.current_total_price,
-                       // productos,
-//flete: navegacion.shipping_lines[0].price,
-                      //  correos
+                        marcacion,
+                        valorTotal,
+                        productos,
+                        flete,
+                        correos
                     }
-                    
-                    return venta
+
+                    return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
+                        return resultado.data
+                    }).catch((err) => {
+                        console.log(err)
+                        return err
+                    })
 
                 }
-    
-                
+
+
 
             }
 
-           
+
 
         }
-    
-        
+
+
     }
 
 

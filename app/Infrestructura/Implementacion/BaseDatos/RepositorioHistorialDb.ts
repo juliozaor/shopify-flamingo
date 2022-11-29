@@ -73,12 +73,30 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     async  guardarVentasVtex(informacion:any){
         let appToken = '';
         let appKey = '';
+
+
+        if (informacion){
+            const log = {
+                "referidos": informacion
+            }
+            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
+                console.warn(resultado);
+                
+            }).catch((err) => {
+                console.error(err)
+            })
+        }
+
+
+
+
         appKey = informacion.Origin.Key
         const datosCuenta = {
             cuenta: informacion.Origin.Account,
             llave: appKey
         }
 
+        
         const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
             return resultado
         }).catch((err) => {
@@ -106,8 +124,20 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 return null
             })
 
+
+           
+
             // Validar la informacion para sacar los datos
             if (navegacion && navegacion.customData) {
+                const log = {
+                    "referidos": navegacion
+                }
+                axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
+                    console.warn(resultado);                    
+                }).catch((err) => {
+                    console.error(err)
+                })
+
                 const marcacion = navegacion.customData.customApps[0].fields.aliados;
                 let valorTotal;
                 let flete;

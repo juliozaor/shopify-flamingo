@@ -22,8 +22,12 @@ export default class ControladorCategorias {
     }
 
     public async guardarVtex({ request }) {
-        const datos = request.all();
 
+        console.log("entro a la ruta de vtex")
+
+        const datos = request.all();
+        console.log(datos)
+        console.log("===================================")
         return await this.servicio.guardarVtex(JSON.stringify(datos))
 
     }

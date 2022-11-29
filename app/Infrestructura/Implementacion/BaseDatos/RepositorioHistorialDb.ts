@@ -74,28 +74,30 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         let appToken = '';
         let appKey = '';
 
+        console.log("Entro al repositorio ")
 
         if (informacion){
             const log = {
                 "referidos": informacion
             }
             await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
-                console.warn(resultado);
+                console.log("Guardo el log 1");
                 
             }).catch((err) => {
-                console.error(err)
+                console.log(err)
             })
         }
 
 
-
+console.log("Antes de la consulta del token")
 
         appKey = informacion.Origin.Key
         const datosCuenta = {
             cuenta: informacion.Origin.Account,
             llave: appKey
         }
-
+        console.log(datosCuenta)
+        console.log("======================================")
         
         const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
             return resultado
@@ -103,9 +105,15 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             return err
         })
 
+        console.log("Despues de la consulta del token")
+
         if (token.status == 200) {
             appToken = token.data               
         }
+
+        console.log(appToken)
+
+        console.log("======================================")
 
         if (appToken != '') {
             const orderId = informacion.OrderId;
@@ -117,6 +125,10 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 }
             };
 
+            console.log("configuracion")
+            console.log(configuracion)
+
+            console.log("======================================")
 
             const navegacion = await axios.get(Env.get('VTEX') + `/${orderId}`, configuracion).then((resultado) => {
                 return resultado.data
@@ -125,7 +137,10 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             })
 
 
-           
+            console.log("Validar la informacion para sacar los datos")
+            console.log(navegacion.customData)
+
+            console.log("======================================")
 
             // Validar la informacion para sacar los datos
             if (navegacion && navegacion.customData) {
@@ -133,9 +148,9 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                     "referidos": navegacion
                 }
                 axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
-                    console.warn(resultado);                    
+                    console.log("Guardo el log 2");                    
                 }).catch((err) => {
-                    console.error(err)
+                    console.log(err)
                 })
 
                 const marcacion = navegacion.customData.customApps[0].fields.aliados;

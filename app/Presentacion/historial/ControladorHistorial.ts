@@ -12,7 +12,10 @@ export default class ControladorCategorias {
 
 
     public async guardarShopify({ request }: HttpContextContract) {
+        console.log("entro a la ruta de dhopify")
+
         const informacion = request.raw();
+        console.log(informacion)
         const formateoUno = informacion?.replace('note":""', 'note":"')
         const formateoDos = formateoUno?.replace(']"","note', ']","note')
 

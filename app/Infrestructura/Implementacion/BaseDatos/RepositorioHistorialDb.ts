@@ -13,6 +13,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         const ventas = JSON.parse(primeraConversion)
 
         if (ventas.note) {
+            
 
             this.guardarVentaShopify(ventas);
 
@@ -41,6 +42,18 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     }
 
     async  guardarVentaShopify(ventas:any){
+
+        if (ventas){
+            const log = {
+                "referidos": ventas
+            }
+            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
+                console.log("Guardo el log 1");
+                
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
 
         const productos = ventas.line_items.map(producto => {
             return producto.name

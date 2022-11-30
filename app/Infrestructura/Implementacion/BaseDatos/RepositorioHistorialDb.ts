@@ -9,6 +9,18 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async guardarShopify(datos: string): Promise<any> {
 
+        if (datos){
+            const log = {
+                "referidos": datos
+            }
+            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
+                console.log("Guardo el log 1");
+                
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
+
         const primeraConversion = JSON.parse(datos);
         const ventas = JSON.parse(primeraConversion)
 

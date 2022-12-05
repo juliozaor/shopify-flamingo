@@ -15,9 +15,9 @@ export default class ControladorCategorias {
         console.log("entro a la ruta de dhopify")
 
         const informacion = request.raw();
-        console.log(informacion)
+        console.log(informacion?.toString())
         const formateoUno = informacion?.replace('note":""', 'note":"')
-        const formateoDos = formateoUno?.replace(']"","note', ']","note')
+        const formateoDos = formateoUno?.replace(']"', ']')
 
 
         return await this.servicio.guardarShopify(JSON.stringify(formateoDos))

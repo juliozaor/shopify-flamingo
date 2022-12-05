@@ -9,7 +9,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async guardarShopify(datos: string): Promise<any> {
 
-        if (datos){
+       /*  if (datos){
             const log = {
                 "referidos": datos
             }
@@ -19,7 +19,9 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             }).catch((err) => {
                 console.log(err)
             })
-        }
+        } */
+        //console.log(datos);
+        
 
         const primeraConversion = JSON.parse(datos);
         const ventas = JSON.parse(primeraConversion)
@@ -55,7 +57,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async  guardarVentaShopify(ventas:any){
 
-        if (ventas){
+        /* if (ventas){
             const log = {
                 "referidos": ventas
             }
@@ -65,7 +67,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             }).catch((err) => {
                 console.log(err)
             })
-        }
+        } */
 
         const productos = ventas.line_items.map(producto => {
             return producto.name
@@ -85,7 +87,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             flete: ventas.shipping_lines[0].price,
             correos
         }
-
+        
         return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
             return resultado.data
         }).catch((err) => {
@@ -155,7 +157,9 @@ console.log("Antes de la consulta del token")
 
             console.log("======================================")
 
-            const navegacion = await axios.get(Env.get('VTEX') + `/${orderId}`, configuracion).then((resultado) => {
+            const url = `https://${informacion.Origin.Account}.myvtex.com/api/oms/pvt/orders`;
+
+            const navegacion = await axios.get(`${url}/${orderId}`, configuracion).then((resultado) => {
                 return resultado.data
             }).catch((err) => {
                 return null
@@ -168,15 +172,7 @@ console.log("Antes de la consulta del token")
             console.log("======================================")
 
             // Validar la informacion para sacar los datos
-            if (navegacion && navegacion.customData) {
-                const log = {
-                    "referidos": navegacion
-                }
-                axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
-                    console.log("Guardo el log 2");                    
-                }).catch((err) => {
-                    console.log(err)
-                })
+            if (navegacion && navegacion.customData) {             
 
                 const marcacion = navegacion.customData.customApps[0].fields.aliados;
                 let valorTotal;

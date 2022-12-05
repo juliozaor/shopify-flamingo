@@ -104,16 +104,17 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         console.log("Entro al repositorio ")
 
         if (informacion){
-            const log = {
+            /* const log = {
                 "referidos": informacion
-            }
-            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
+            } */
+            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
                 console.log("Guardo el log 1");
                 
             }).catch((err) => {
                 console.log(err)
             })
         }
+        
 
 
 console.log("Antes de la consulta del token")

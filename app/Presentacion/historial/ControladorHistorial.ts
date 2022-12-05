@@ -19,7 +19,7 @@ export default class ControladorCategorias {
 
         if (informacion){
             await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
-                console.log("Guardo el log 1");
+                console.log("Guardo el log shopify");
                 
             }).catch((err) => {
                 console.log(err)
@@ -37,11 +37,11 @@ export default class ControladorCategorias {
 
     public async guardarVtex({ request }) {
 
-        console.log("entro a la ruta de vtex")
+       // console.log("entro a la ruta de vtex")
 
         const datos = request.all();
-        console.log(datos)
-        console.log("===================================")
+       /*  console.log(datos)
+        console.log("===================================") */
         return await this.servicio.guardarVtex(JSON.stringify(datos))
 
     }

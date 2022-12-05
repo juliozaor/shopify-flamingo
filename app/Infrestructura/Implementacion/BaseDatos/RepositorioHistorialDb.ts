@@ -91,28 +91,21 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         let appToken = '';
         let appKey = '';
 
-        console.log("Entro al repositorio ")
+      //  console.log("Entro al repositorio ")
 
-        /* if (informacion){            
-            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
-                console.log("Guardo el log 1");
-                
-            }).catch((err) => {
-                console.log(err)
-            })
-        } */
+       
         
 
 
-console.log("Antes de la consulta del token")
+//console.log("Antes de la consulta del token")
 
         appKey = informacion.Origin.Key
         const datosCuenta = {
             cuenta: informacion.Origin.Account,
             llave: appKey
         }
-        console.log(datosCuenta)
-        console.log("======================================")
+       /*  console.log(datosCuenta)
+        console.log("======================================") */
         
         const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
             return resultado
@@ -120,15 +113,15 @@ console.log("Antes de la consulta del token")
             return err
         })
 
-        console.log("Despues de la consulta del token")
+      //  console.log("Despues de la consulta del token")
 
         if (token.status == 200) {
             appToken = token.data               
         }
 
-        console.log(appToken)
+       /*  console.log(appToken)
 
-        console.log("======================================")
+        console.log("======================================") */
 
         if (appToken != '') {
             const orderId = informacion.OrderId;
@@ -140,10 +133,10 @@ console.log("Antes de la consulta del token")
                 }
             };
 
-            console.log("configuracion")
+        /*     console.log("configuracion")
             console.log(configuracion)
 
-            console.log("======================================")
+            console.log("======================================") */
 
             const url = `https://${informacion.Origin.Account}.myvtex.com/api/oms/pvt/orders`;
 
@@ -153,26 +146,37 @@ console.log("Antes de la consulta del token")
                 return null
             })
 
-            console.log('Orden :: ' + orderId)
+           /*  console.log('Orden :: ' + orderId)
 
             console.log("Validar la informacion para sacar los datos")
             console.log(navegacion.customData)
 
-            console.log("======================================")
+            console.log("======================================") */
 
             // Validar la informacion para sacar los datos
             if (navegacion && navegacion.customData) {   
-                
-                console.log("Entro a validar el customData")
+                 
+            /*    console.log("Entro a validar el customData") */
 
                 const marcacion = navegacion.customData.customApps[0].fields.aliados;
 
-                console.log('=========== marcacion ==============')
+             /*    console.log('=========== marcacion ==============')
                 console.log(marcacion)
 
-                console.log("======================================")
+                console.log("======================================") */
 
                 if(marcacion){
+
+                     if (informacion){            
+            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
+                console.log("Guardo el log vtex");
+                
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
+
+
                 let valorTotal;
                 let flete;
                 let correos = await JSON.parse(marcacion).map(marca => {

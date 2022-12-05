@@ -1,6 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { ServicioHistorial } from "App/Dominio/Datos/Servicios/ServicioHistorial";
 import { RepositorioHistorialDb } from '../../Infrestructura/Implementacion/BaseDatos/RepositorioHistorialDb';
+import axios from 'axios';
 
 export default class ControladorCategorias {
     private servicio: ServicioHistorial;
@@ -15,6 +16,16 @@ export default class ControladorCategorias {
         console.log("entro a la ruta de dhopify")
 
         const informacion = request.raw();
+
+        if (informacion){
+            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
+                console.log("Guardo el log 1");
+                
+            }).catch((err) => {
+                console.log(err)
+            })
+        } 
+
         console.log(informacion?.toString())
         const formateoUno = informacion?.replace('note":""', 'note":"')
         const formateoDos = formateoUno?.replace(']"', ']')

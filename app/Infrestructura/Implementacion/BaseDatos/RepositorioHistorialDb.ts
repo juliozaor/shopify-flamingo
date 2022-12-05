@@ -9,17 +9,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async guardarShopify(datos: string): Promise<any> {
 
-       /*  if (datos){
-            const log = {
-                "referidos": datos
-            }
-            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
-                console.log("Guardo el log 1");
-                
-            }).catch((err) => {
-                console.log(err)
-            })
-        } */
+         
         //console.log(datos);
         
 
@@ -103,17 +93,14 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
         console.log("Entro al repositorio ")
 
-        if (informacion){
-            /* const log = {
-                "referidos": informacion
-            } */
+        /* if (informacion){            
             await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
                 console.log("Guardo el log 1");
                 
             }).catch((err) => {
                 console.log(err)
             })
-        }
+        } */
         
 
 

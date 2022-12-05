@@ -166,6 +166,7 @@ console.log("Antes de la consulta del token")
                 return null
             })
 
+            console.log('Orden :: ' + orderId)
 
             console.log("Validar la informacion para sacar los datos")
             console.log(navegacion.customData)
@@ -173,9 +174,18 @@ console.log("Antes de la consulta del token")
             console.log("======================================")
 
             // Validar la informacion para sacar los datos
-            if (navegacion && navegacion.customData) {             
+            if (navegacion && navegacion.customData) {   
+                
+                console.log("Entro a validar el customData")
 
                 const marcacion = navegacion.customData.customApps[0].fields.aliados;
+
+                console.log('=========== marcacion ==============')
+                console.log(marcacion)
+
+                console.log("======================================")
+
+                if(marcacion){
                 let valorTotal;
                 let flete;
                 let correos = await JSON.parse(marcacion).map(marca => {
@@ -211,6 +221,8 @@ console.log("Antes de la consulta del token")
                     console.log(err)
                     return err
                 })
+
+            }
 
             }
 

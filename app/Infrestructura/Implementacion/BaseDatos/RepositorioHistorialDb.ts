@@ -25,6 +25,8 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
             return true
 
+        }else{
+
         }
 
         return false
@@ -150,16 +152,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
                 console.log("======================================") */
 
-                if(marcacion){
-
-                     if (informacion){            
-            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {
-                console.log("Guardo el log vtex");
-                
-            }).catch((err) => {
-                console.log(err)
-            })
-        }
+                if(marcacion){                     
 
 
                 let valorTotal;
@@ -206,6 +199,12 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
         }
 
+    }
+
+    async buscarMarcaionPorCorreo(correo:string){
+
+
+    
     }
 
 }

@@ -25,8 +25,6 @@ export default class ControladorCategorias {
                 console.log(err)
             })
         } 
-
-        console.log(informacion?.toString())
         const formateoUno = informacion?.replace('note":""', 'note":"')
         const formateoDos = formateoUno?.replace(']"', ']')
 

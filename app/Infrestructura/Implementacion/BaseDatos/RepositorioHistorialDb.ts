@@ -13,8 +13,10 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         //console.log(datos);
         
 
-        const primeraConversion = JSON.parse(datos);
-        const ventas = JSON.parse(primeraConversion)
+       /*  const primeraConversion = JSON.parse(datos);
+        const ventas = JSON.parse(primeraConversion) */
+
+        const ventas = JSON.parse(datos)
 
         if (ventas.note) {
             
@@ -47,19 +49,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async  guardarVentaShopify(ventas:any){
 
-        /* if (ventas){
-            const log = {
-                "referidos": ventas
-            }
-            await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, log).then((resultado) => {
-                console.log("Guardo el log 1");
-                
-            }).catch((err) => {
-                console.log(err)
-            })
-        } */
-
-        const productos = ventas.line_items.map(producto => {
+      const productos = ventas.line_items.map(producto => {
             return producto.name
         })
 
@@ -90,11 +80,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     async  guardarVentasVtex(informacion:any){
         let appToken = '';
         let appKey = '';
-
-      //  console.log("Entro al repositorio ")
-
-       
-        
 
 
 //console.log("Antes de la consulta del token")

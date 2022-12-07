@@ -42,8 +42,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         }
 
         return false
-
-
     }
 
     async guardarVentaShopify(ventas: any) {
@@ -58,25 +56,39 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
             marcacion = ventas.note;
 
-        } else {
+        }  else if(ventas.customer){
 
-            return false
+            const correosClientes = ventas.customer.email
+            const cuenta = ventas.line_items[0].vendor
+            
+            const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes, cuenta)
+            const datosRecibidos = await datosMarcacion.then(datos => {
+
+                if (datos.data)
+                    return datos.data
+
+                return []
+            })
+
+            if (datosRecibidos.length > 0) {
+                let ir = new Array();
+                let em = new Array();
+
+                datosRecibidos.forEach(datos => {
+                    ir.push({"ir":datos.mar_id})
+                    em.push(datos.mar_correo_cliente)
+                });
+
+                marcacion = JSON.stringify(ir)
+                correos = em
+
+            }         
         }
 
-        /* else if(ventas.customer.email){
-
-            const marcacionFlamingo = this.buscarMarcaionPorCorreo(ventas.customer.email); 
-
-            console.log(marcacion)
-
-        } */
-
-
+        if (marcacion) {
         const productos = ventas.line_items.map(producto => {
             return producto.name
         })
-
-
 
         const venta = {
             id: uuidAPIKey.create().uuid,
@@ -96,8 +108,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             return err
         })
 
-
-
+    }
 
 
     }

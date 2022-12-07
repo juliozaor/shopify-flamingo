@@ -9,23 +9,20 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async guardarShopify(datos: string): Promise<any> {
 
-         
+
         //console.log(datos);
-        
 
-       /*  const primeraConversion = JSON.parse(datos);
-        const ventas = JSON.parse(primeraConversion) */
 
-        const ventas = JSON.parse(datos)
+        const primeraConversion = JSON.parse(datos);
+        const ventas = JSON.parse(primeraConversion)
 
-        if (ventas.note) {
-            
+        // const ventas =await JSON.parse(datos)
+
+        if (ventas) {
 
             this.guardarVentaShopify(ventas);
 
             return true
-
-        }else{
 
         }
 
@@ -36,7 +33,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     async guardarVtex(datos: string): Promise<any> {
 
         const informacion = JSON.parse(datos);
-        
+
         if (informacion.Origin) {
             this.guardarVentasVtex(informacion);
 
@@ -49,66 +46,89 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     }
 
-    async  guardarVentaShopify(ventas:any){
+    async guardarVentaShopify(ventas: any) {
 
-      const productos = ventas.line_items.map(producto => {
+        let correos;
+        let marcacion;
+        if (ventas.note) {
+
+            correos = await JSON.parse(ventas.note).map(marca => {
+                return marca.em
+            })
+
+            marcacion = ventas.note;
+
+        } else {
+
+            return false
+        }
+
+        /* else if(ventas.customer.email){
+
+            const marcacionFlamingo = this.buscarMarcaionPorCorreo(ventas.customer.email); 
+
+            console.log(marcacion)
+
+        } */
+
+
+        const productos = ventas.line_items.map(producto => {
             return producto.name
         })
 
-        let correos = await JSON.parse(ventas.note).map(marca => {
-            return marca.em
-        })
+
 
         const venta = {
             id: uuidAPIKey.create().uuid,
             ordenCompra: ventas.order_number,
             fechaOrden: ventas.updated_at,
-            marcacion: ventas.note,
+            marcacion,
             valorTotal: ventas.current_total_price,
             productos,
             flete: ventas.shipping_lines[0].price,
             correos
         }
-        
+
         return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
             return resultado.data
         }).catch((err) => {
             console.log(err)
             return err
         })
+
+
+
+
+
     }
 
 
-    async  guardarVentasVtex(informacion:any){
+    async guardarVentasVtex(informacion: any) {
         let appToken = '';
         let appKey = '';
 
 
-//console.log("Antes de la consulta del token")
+        //console.log("Antes de la consulta del token")
 
         appKey = informacion.Origin.Key
         const datosCuenta = {
             cuenta: informacion.Origin.Account,
             llave: appKey
         }
-       /*  console.log(datosCuenta)
-        console.log("======================================") */
-        
+        /*  console.log(datosCuenta)
+         console.log("======================================") */
+
         const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
             return resultado
         }).catch((err) => {
             return err
         })
 
-      //  console.log("Despues de la consulta del token")
+        //  console.log("Despues de la consulta del token")
 
         if (token.status == 200) {
-            appToken = token.data               
+            appToken = token.data
         }
-
-       /*  console.log(appToken)
-
-        console.log("======================================") */
 
         if (appToken != '') {
             const orderId = informacion.OrderId;
@@ -120,11 +140,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 }
             };
 
-        /*     console.log("configuracion")
-            console.log(configuracion)
-
-            console.log("======================================") */
-
             const url = `https://${informacion.Origin.Account}.myvtex.com/api/oms/pvt/orders`;
 
             const navegacion = await axios.get(`${url}/${orderId}`, configuracion).then((resultado) => {
@@ -132,66 +147,89 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             }).catch((err) => {
                 return null
             })
+            if (navegacion) {
 
-           /*  console.log('Orden :: ' + orderId)
+                let correos: any;
 
-            console.log("Validar la informacion para sacar los datos")
-            console.log(navegacion.customData)
+                let marcacion: any;
 
-            console.log("======================================") */
+                if (navegacion.customData) {
 
-            // Validar la informacion para sacar los datos
-            if (navegacion && navegacion.customData) {   
-                 
-            /*    console.log("Entro a validar el customData") */
+                    marcacion = navegacion.customData.customApps[0].fields.aliados;
 
-                const marcacion = navegacion.customData.customApps[0].fields.aliados;
-
-             /*    console.log('=========== marcacion ==============')
-                console.log(marcacion)
-
-                console.log("======================================") */
-
-                if(marcacion){                     
-
-
-                let valorTotal;
-                let flete;
-                let correos = await JSON.parse(marcacion).map(marca => {
-                    return marca.em
-                })
-                await navegacion.totals.map(total => {
-                    if (total.id == 'Items') {
-                        valorTotal = total.value.toString();
+                    if (marcacion) {
+                        correos = await JSON.parse(marcacion).map(marca => {
+                            return marca.em
+                        })
                     }
-                    if (total.id == 'Shipping') {
-                        flete = total.value.toString();
+                } else {
+                    const correosClientes = navegacion.clientProfileData.email.split('-')
+                    const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes[0], informacion.Origin.Account)
+
+                    const datosRecibidos = await datosMarcacion.then(datos => {
+
+                        if (datos.data)
+                            return datos.data
+
+                        return []
+                    })
+
+
+                    if (datosRecibidos.length > 0) {
+                        let ir = new Array();
+                        let em = new Array();
+
+                        datosRecibidos.forEach(datos => {
+                            ir.push({"ir":datos.mar_id})
+                            em.push(datos.mar_correo_cliente)
+                        });
+
+                        marcacion = JSON.stringify(ir)
+                        correos = em
+
                     }
-                })
-                const productos = await navegacion.items.map(item => {
-                    return item.name
-                })
 
 
-                const venta = {
-                    id: uuidAPIKey.create().uuid,
-                    ordenCompra: navegacion.orderId,
-                    fechaOrden: navegacion.creationDate,
-                    marcacion,
-                    valorTotal,
-                    productos,
-                    flete,
-                    correos
+
                 }
 
-                return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
-                    return resultado.data
-                }).catch((err) => {
-                    console.log(err)
-                    return err
-                })
+                if (marcacion) {
 
-            }
+                    let valorTotal;
+                    let flete;
+
+                    await navegacion.totals.map(total => {
+                        if (total.id == 'Items') {
+                            valorTotal = total.value.toString();
+                        }
+                        if (total.id == 'Shipping') {
+                            flete = total.value.toString();
+                        }
+                    })
+                    const productos = await navegacion.items.map(item => {
+                        return item.name
+                    })
+
+
+                    const venta = {
+                        id: uuidAPIKey.create().uuid,
+                        ordenCompra: navegacion.orderId,
+                        fechaOrden: navegacion.creationDate,
+                        marcacion,
+                        valorTotal,
+                        productos,
+                        flete,
+                        correos
+                    }
+                     return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
+                        return resultado.data
+                    }).catch((err) => {
+                        console.log(err)
+                        return err
+                    }) 
+
+
+                }
 
             }
 
@@ -201,10 +239,17 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     }
 
-    async buscarMarcaionPorCorreo(correo:string){
+    async buscarMarcaionPorCorreo(correo: string, cuenta: string) {
+        const datosBusqueda = {
+            cuenta,
+            correo
+        }
+        return await axios.post(Env.get('BACKEND') + `/ventas/marcacion`, datosBusqueda).then((resultado) => {
+            return resultado
+        }).catch((err) => {
+            return err
+        })
 
-
-    
     }
 
 }

@@ -168,11 +168,14 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
                     marcacion = navegacion.customData.customApps[0].fields.aliados;
 
-                    if (marcacion) {
+                   /*  if (marcacion) {
                         correos = await JSON.parse(marcacion).map(marca => {
                             return marca.em
                         })
-                    }
+                    } */
+                    const correosClientes = navegacion.clientProfileData.email.split('-')
+                
+                    correos = `["${correosClientes[0]}"]`
                 } else {
                     const correosClientes = navegacion.clientProfileData.email.split('-')
                     const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes[0], informacion.Origin.Account)
@@ -216,7 +219,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                             valorTotal = total.value.toString();
                         } */
                         if (total.id == 'Shipping') {
-                            flete = total.value.toString();
+                            flete = total.value / 100;
                         }
                     })
                     const productos = await navegacion.items.map(item => {
@@ -231,7 +234,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                         marcacion,
                         valorTotal: valorTotal.toString(),
                         productos,
-                        flete,
+                        flete: flete.toString(),
                         correos
                     }
                      return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {

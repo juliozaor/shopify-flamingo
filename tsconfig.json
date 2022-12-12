@@ -32,7 +32,8 @@
       "@adonisjs/repl",
       "adonis5-swagger",
       "@adonisjs/lucid",
-      "adonis5-scheduler"
+      "adonis5-scheduler",
+      "@adonisjs/shield"
     ]
   }
 }

@@ -9,3 +9,5 @@ Route.group(() => {
 Route.group(() => {
   Route.post('/', controlador+'.guardarVtex')
 }).prefix('/api/v1/vtex')
+
+Route.get('/api/v1/js/*', controlador+'.mostrarArchivo')

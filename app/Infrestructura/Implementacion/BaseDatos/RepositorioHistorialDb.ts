@@ -209,10 +209,12 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                     let valorTotal;
                     let flete;
 
+                    valorTotal = navegacion.value / 100
+
                     await navegacion.totals.map(total => {
-                        if (total.id == 'Items') {
+                        /* if (total.id == 'Items') {
                             valorTotal = total.value.toString();
-                        }
+                        } */
                         if (total.id == 'Shipping') {
                             flete = total.value.toString();
                         }
@@ -227,7 +229,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                         ordenCompra: navegacion.orderId,
                         fechaOrden: navegacion.creationDate,
                         marcacion,
-                        valorTotal,
+                        valorTotal: valorTotal.toString(),
                         productos,
                         flete,
                         correos

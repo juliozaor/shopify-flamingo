@@ -2,6 +2,8 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { ServicioHistorial } from "App/Dominio/Datos/Servicios/ServicioHistorial";
 import { RepositorioHistorialDb } from '../../Infrestructura/Implementacion/BaseDatos/RepositorioHistorialDb';
 import axios from 'axios';
+import { extname } from 'path'
+import Drive from '@ioc:Adonis/Core/Drive'
 
 export default class ControladorCategorias {
     private servicio: ServicioHistorial;
@@ -45,6 +47,21 @@ export default class ControladorCategorias {
             })
         }
         return await this.servicio.guardarVtex(JSON.stringify(datos))
+
+    }
+
+
+    public async mostrarArchivo({ request, response }: HttpContextContract) {
+        const ubicacion = request.param('*').join('/')
+        try {
+            const { size } = await Drive.getStats(ubicacion)
+            response.type(extname(ubicacion))
+            response.header('content-length', size)
+
+            return response.stream(await Drive.getStream(ubicacion))
+        } catch (error) {
+            response.status(400).send("Archivo no encontrado")
+        }
 
     }
 

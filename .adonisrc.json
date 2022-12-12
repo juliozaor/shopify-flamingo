@@ -16,7 +16,7 @@
     "Contracts": "contracts"
   },
   "preloads": [
-    "./start/rutas/historial",  
+    "./start/rutas/historial",
     "./start/routes",
     "./start/kernel"
   ],
@@ -25,7 +25,8 @@
     "@adonisjs/core",
     "adonis5-swagger",
     "@adonisjs/lucid",
-    "adonis5-scheduler"
+    "adonis5-scheduler",
+    "@adonisjs/shield"
   ],
   "aceProviders": [
     "@adonisjs/repl"

@@ -1,6 +1,7 @@
 node_modules
 build
 coverage
+archivos
 .vscode
 .DS_STORE
 tmp

@@ -16,7 +16,7 @@ export default class ControladorCategorias {
 
     public async guardarShopify({ request }: HttpContextContract) {
 
-        const informacion = request.raw();
+        const informacion = request.raw()?.toString();
 
          if (informacion){
             await axios.post(`https://tysa.co/flamingo/marcacion/recibirvtex.php`, informacion).then((resultado) => {

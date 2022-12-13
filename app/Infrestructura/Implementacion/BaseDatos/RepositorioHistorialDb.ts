@@ -49,7 +49,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         let correos;
         let marcacion;
         if (ventas.note) {
-
             correos = await JSON.parse(ventas.note).map(marca => {
                 return marca.em
             })
@@ -135,8 +134,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             return err
         })
 
-        //  console.log("Despues de la consulta del token")
-
         if (token.status == 200) {
             appToken = token.data
         }
@@ -150,7 +147,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                     'X-VTEX-API-AppToken': appToken
                 }
             };
-
             const url = `https://${informacion.Origin.Account}.myvtex.com/api/oms/pvt/orders`;
 
             const navegacion = await axios.get(`${url}/${orderId}`, configuracion).then((resultado) => {
@@ -167,12 +163,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 if (navegacion.customData) {
 
                     marcacion = navegacion.customData.customApps[0].fields.aliados;
-
-                   /*  if (marcacion) {
-                        correos = await JSON.parse(marcacion).map(marca => {
-                            return marca.em
-                        })
-                    } */
                     const correosClientes = navegacion.clientProfileData.email.split('-')
                 
                     correos = `["${correosClientes[0]}"]`

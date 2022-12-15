@@ -47,7 +47,8 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         }  else if(ventas.customer){
 
             const correosClientes = ventas.email
-            const cuenta = ventas.line_items[0].vendor
+           // const cuenta = ventas.line_items[0].vendor
+           const cuenta = ventas.app_id
             
             const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes, cuenta)
             const datosRecibidos = await datosMarcacion.then(datos => {
@@ -123,31 +124,42 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         let cuentaInformacion = informacion.Origin.Account;
 
         const orden = informacion.OrderId.split('-');
-        if(orden[0]=='FLM'){
-            orderId = orderId.slice(4)
-            appKey = 'vtexappkey-flamingo-SZRKQB';
-            cuentaInformacion = 'flamingo';
+
+        const datosPrefijo = {
+            prefijo: orden[0]
         }
 
-        //console.log("Antes de la consulta del token")
+        const prefijo =  await axios.post(Env.get('BACKEND') + `/ventas/prefijo`, datosPrefijo).then((resultado) => {
+            
+            if (resultado.data)
+            return resultado.data
 
-        
-        const datosCuenta = {
-            cuenta: cuentaInformacion,
-            llave: appKey
-        }
-        /*  console.log(datosCuenta)
-         console.log("======================================") */
-
-        const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
-            return resultado
+        return []
         }).catch((err) => {
             return err
         })
 
-        if (token.status == 200) {
-            appToken = token.data
+        if(prefijo.length > 0){
+            appKey = prefijo[0].fil_llave;
+            appToken = prefijo[0].fil_token;
+            orderId = orderId.slice(4);
+            cuentaInformacion = prefijo[0].fil_cuenta;
+        }else{
+            const datosCuenta = {
+                cuenta: cuentaInformacion,
+                llave: appKey
+            }
+            const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
+                return resultado
+            }).catch((err) => {
+                return err
+            })
+    
+            if (token.status == 200) {
+                appToken = token.data
+            }
         }
+    
 
         if (appToken != '') {
             
@@ -216,9 +228,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                     valorTotal = navegacion.value / 100
 
                     await navegacion.totals.map(total => {
-                        /* if (total.id == 'Items') {
-                            valorTotal = total.value.toString();
-                        } */
                         if (total.id == 'Shipping') {
                             flete = total.value / 100;
                         }

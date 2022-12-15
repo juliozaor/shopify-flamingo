@@ -35,23 +35,18 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
         let correos;
         let marcacion;
-        console.log(ventas.note);
-        
-
-        const correoprueba = JSON.parse(ventas.note)
-        console.log((correoprueba));
-        
 
         if (ventas.note) {
-            correos = await ventas.note.map(marca => {
+           /* const correoFormateado = JSON.parse(ventas.note)
+            correos = await correoFormateado.map(marca => {
                 return marca.em
-            })
-
+            }) */
+            correos = ventas.email;
             marcacion = ventas.note;
 
         }  else if(ventas.customer){
 
-            const correosClientes = ventas.customer.email
+            const correosClientes = ventas.email
             const cuenta = ventas.line_items[0].vendor
             
             const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes, cuenta)

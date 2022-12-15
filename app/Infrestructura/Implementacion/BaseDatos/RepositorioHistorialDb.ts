@@ -35,8 +35,15 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
         let correos;
         let marcacion;
+        console.log(ventas.note);
+        
+
+        const correoprueba = JSON.parse(ventas.note)
+        console.log((correoprueba));
+        
+
         if (ventas.note) {
-            correos = await JSON.parse(ventas.note).map(marca => {
+            correos = await ventas.note.map(marca => {
                 return marca.em
             })
 

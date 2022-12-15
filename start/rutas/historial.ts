@@ -3,7 +3,6 @@ const controlador = "../../Presentacion/historial/ControladorHistorial"
 
 Route.group(() => {
   Route.post('/', controlador+'.guardarShopify')
-  Route.get('/', controlador+'.buscar')
 }).prefix('/api/v1/shopify')
 
 Route.group(() => {

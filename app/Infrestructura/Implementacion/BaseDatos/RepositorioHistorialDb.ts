@@ -30,19 +30,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     }
 
-    async guardarVtex(datos: string): Promise<any> {
-
-        const informacion = JSON.parse(datos);
-
-        if (informacion.Origin) {
-            this.guardarVentasVtex(informacion);
-
-            return true
-
-        }
-
-        return false
-    }
 
     async guardarVentaShopify(ventas: any) {
 
@@ -113,16 +100,38 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     }
 
 
+    async guardarVtex(datos: string): Promise<any> {
+
+        const informacion = JSON.parse(datos);
+
+        if (informacion.Origin) {
+            this.guardarVentasVtex(informacion);
+
+            return true
+
+        }
+
+        return false
+    } 
+
     async guardarVentasVtex(informacion: any) {
         let appToken = '';
-        let appKey = '';
+        let orderId = informacion.OrderId;
+        let appKey = informacion.Origin.Key;
+        let cuentaInformacion = informacion.Origin.Account;
 
+        const orden = informacion.OrderId.split('-');
+        if(orden[0]=='FLM'){
+            orderId = orderId.slice(4)
+            appKey = 'vtexappkey-flamingo-SZRKQB';
+            cuentaInformacion = 'flamingo';
+        }
 
         //console.log("Antes de la consulta del token")
 
-        appKey = informacion.Origin.Key
+        
         const datosCuenta = {
-            cuenta: informacion.Origin.Account,
+            cuenta: cuentaInformacion,
             llave: appKey
         }
         /*  console.log(datosCuenta)
@@ -139,7 +148,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         }
 
         if (appToken != '') {
-            const orderId = informacion.OrderId;
+            
 
             const configuracion = {
                 headers: {
@@ -147,7 +156,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                     'X-VTEX-API-AppToken': appToken
                 }
             };
-            const url = `https://${informacion.Origin.Account}.myvtex.com/api/oms/pvt/orders`;
+            const url = `https://${cuentaInformacion}.myvtex.com/api/oms/pvt/orders`;
 
             const navegacion = await axios.get(`${url}/${orderId}`, configuracion).then((resultado) => {
                 return resultado.data
@@ -168,7 +177,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                     correos = `["${correosClientes[0]}"]`
                 } else {
                     const correosClientes = navegacion.clientProfileData.email.split('-')
-                    const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes[0], informacion.Origin.Account)
+                    const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes[0], cuentaInformacion)
 
                     const datosRecibidos = await datosMarcacion.then(datos => {
 

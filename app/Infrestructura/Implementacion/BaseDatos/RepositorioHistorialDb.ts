@@ -37,6 +37,8 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         let marcacion;
 
         if (ventas.note) {
+
+            console.log('entro 1')
            /* const correoFormateado = JSON.parse(ventas.note)
             correos = await correoFormateado.map(marca => {
                 return marca.em
@@ -44,7 +46,15 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             correos = ventas.email;
             marcacion = ventas.note;
 
+            console.log({
+                correos, marcacion
+            });
+            
+
         }  else if(ventas.customer){
+
+            console.log('Entro 2');
+            
 
             const correosClientes = ventas.email
            // const cuenta = ventas.line_items[0].vendor
@@ -75,6 +85,9 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         }
 
         if (marcacion) {
+
+            console.log('entro 4');
+            
         const productos = ventas.line_items.map(producto => {
             return producto.name
         })
@@ -90,7 +103,13 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             correos
         }
 
+        console.log(venta);
+
+
+        
+
         return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
+            console.log(resultado);                        
             return resultado.data
         }).catch((err) => {
             console.log(err)

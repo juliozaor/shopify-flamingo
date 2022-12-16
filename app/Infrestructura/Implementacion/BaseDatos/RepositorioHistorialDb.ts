@@ -137,6 +137,8 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     } 
 
     async guardarVentasVtex(informacion: any) {
+    console.log('vtex 1');
+    
         let appToken = '';
         let orderId = informacion.OrderId;
         let appKey = informacion.Origin.Key;
@@ -155,6 +157,8 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
         return []
         }).catch((err) => {
+            console.log(err);
+            
             return err
         })
 
@@ -181,6 +185,9 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
     
 
         if (appToken != '') {
+
+            console.log('token');
+            
             
 
             const configuracion = {
@@ -238,8 +245,10 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
 
                 }
-
+                console.log({marcacion}) 
                 if (marcacion) {
+
+                                       
 
                     let valorTotal;
                     let flete;
@@ -266,6 +275,9 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                         flete: flete.toString(),
                         correos
                     }
+
+                    console.log(venta);
+                    
                      return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
                         return resultado.data
                     }).catch((err) => {

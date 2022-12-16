@@ -209,21 +209,29 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             const navegacion = await axios.get(`${url}/${orderId}`, configuracion).then((resultado) => {
                 return resultado.data
             }).catch((err) => {
+                console.log(err);
+                
                 return null
             })
             if (navegacion) {
+
+                console.log('entro a navegacion');
+                
 
                 let correos: any;
 
                 let marcacion: any;
 
                 if (navegacion.customData) {
+console.log('entro a data navegación');
 
                     marcacion = navegacion.customData.customApps[0].fields.aliados;
                     const correosClientes = navegacion.clientProfileData.email.split('-')
                 
                     correos = `["${correosClientes[0]}"]`
                 } else {
+
+                    console.log('entro por correo');
                     const correosClientes = navegacion.clientProfileData.email.split('-')
                     const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes[0], cuentaInformacion)
 

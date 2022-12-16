@@ -159,10 +159,15 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         }).catch((err) => {
             console.log(err);
             
-            return err
+            return []
         })
 
+        console.log({prefijo: prefijo.data});
+        
+
         if(prefijo.length > 0){
+            console.log('entro al prefijo');
+            
             appKey = prefijo[0].fil_llave;
             appToken = prefijo[0].fil_token;
             orderId = orderId.slice(4);
@@ -172,6 +177,9 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 cuenta: cuentaInformacion,
                 llave: appKey
             }
+
+            console.log(datosCuenta);
+            
             const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
                 return resultado
             }).catch((err) => {

@@ -44,7 +44,7 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 return marca.em
             }) */
             correos = ventas.email;
-            marcacion = ventas.note;
+            marcacion = JSON.parse(ventas.note);
 
             console.log({
                 correos, marcacion

@@ -9,10 +9,6 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
     async guardarShopify(datos: string): Promise<any> {
 
-
-        //console.log(datos);
-
-
         const primeraConversion = JSON.parse(datos);
         const ventas = JSON.parse(primeraConversion)
 
@@ -38,28 +34,17 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
 
         if (ventas.note) {
 
-            console.log('entro 1')
-           /* const correoFormateado = JSON.parse(ventas.note)
-            correos = await correoFormateado.map(marca => {
-                return marca.em
-            }) */
             correos = ventas.email;
             marcacion = JSON.parse(ventas.note);
 
-            console.log({
-                correos, marcacion
-            });
-            
 
-        }  else if(ventas.customer){
 
-            console.log('Entro 2');
-            
+        } else if (ventas.customer) {
 
             const correosClientes = ventas.email
-           // const cuenta = ventas.line_items[0].vendor
-           const cuenta = ventas.app_id
-            
+            // const cuenta = ventas.line_items[0].vendor
+            const cuenta = ventas.app_id
+
             const datosMarcacion = this.buscarMarcaionPorCorreo(correosClientes, cuenta)
             const datosRecibidos = await datosMarcacion.then(datos => {
 
@@ -74,49 +59,48 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
                 let em = new Array();
 
                 datosRecibidos.forEach(datos => {
-                    ir.push({"ir":datos.mar_id})
+                    ir.push({ "ir": datos.mar_id })
                     em.push(datos.mar_correo_cliente)
                 });
 
                 marcacion = JSON.stringify(ir)
                 correos = em
 
-            }         
+            }
         }
 
         if (marcacion) {
+            const productos = ventas.line_items.map(producto => {
+                return `ref: ${producto.sku} - cant: ${producto.quantity} - nombre: ${producto.name} - valor : $${producto.price}`
+            })
 
-            console.log('entro 4');
-            
-        const productos = ventas.line_items.map(producto => {
-            return producto.name
-        })
 
-        const venta = {
-            id: uuidAPIKey.create().uuid,
-            ordenCompra: ventas.order_number,
-            fechaOrden: ventas.updated_at,
-            marcacion,
-            valorTotal: ventas.current_total_price,
-            productos,
-            flete: ventas.shipping_lines[0].price,
-            correos
+
+            const venta = {
+                id: uuidAPIKey.create().uuid,
+                ordenCompra: ventas.order_number,
+                fechaOrden: ventas.updated_at,
+                marcacion,
+                valorTotal: ventas.current_total_price,
+                productos,
+                flete: ventas.shipping_lines[0].price,
+                correos,
+                nombreCliente: ventas.billing_address.first_name,
+                apellidoCliente: ventas.billing_address.last_name,
+                documentoCliente: ventas.billing_address.company,
+                medioPago: ventas.payment_gateway_names[0]
+            }
+
+
+            return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
+                console.log(resultado);
+                return resultado.data
+            }).catch((err) => {
+                console.log(err)
+                return err
+            })
+
         }
-
-        console.log(venta);
-
-
-        
-
-        return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
-            console.log(resultado);                        
-            return resultado.data
-        }).catch((err) => {
-            console.log(err)
-            return err
-        })
-
-    }
 
 
     }
@@ -134,11 +118,11 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
         }
 
         return false
-    } 
+    }
 
     async guardarVentasVtex(informacion: any) {
-    console.log('vtex 1');
-    
+        console.log('vtex 1');
+
         let appToken = '';
         let orderId = informacion.OrderId;
         let appKey = informacion.Origin.Key;
@@ -150,53 +134,47 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             prefijo: orden[0]
         }
 
-        const prefijo =  await axios.post(Env.get('BACKEND') + `/ventas/prefijo`, datosPrefijo).then((resultado) => {
-            
-            if (resultado.data)
-            return resultado.data
+        const prefijo = await axios.post(Env.get('BACKEND') + `/ventas/prefijo`, datosPrefijo).then((resultado) => {
 
-        return []
+            if (resultado.data)
+                return resultado.data
+
+            return []
         }).catch((err) => {
             console.log(err);
-            
+
             return []
         })
 
-        console.log({prefijo: prefijo.data});
-        
 
-        if(prefijo.length > 0){
+        if (prefijo.length > 0) {
             console.log('entro al prefijo');
-            
+
             appKey = prefijo[0].fil_llave;
             appToken = prefijo[0].fil_token;
             orderId = orderId.slice(4);
             cuentaInformacion = prefijo[0].fil_cuenta;
-        }else{
+        } else {
             const datosCuenta = {
                 cuenta: cuentaInformacion,
                 llave: appKey
             }
 
-            console.log(datosCuenta);
-            
             const token = await axios.post(Env.get('BACKEND') + `/ventas/filtro`, datosCuenta).then((resultado) => {
                 return resultado
             }).catch((err) => {
+                console.log(err);
+                
                 return err
             })
-    
+
             if (token.status == 200) {
                 appToken = token.data
             }
         }
-    
+
 
         if (appToken != '') {
-
-            console.log('token');
-            
-            
 
             const configuracion = {
                 headers: {
@@ -209,25 +187,19 @@ export class RepositorioHistorialDb implements RepositorioHistoriales {
             const navegacion = await axios.get(`${url}/${orderId}`, configuracion).then((resultado) => {
                 return resultado.data
             }).catch((err) => {
-                console.log(err);
-                
                 return null
             })
             if (navegacion) {
 
-                console.log('entro a navegacion');
-                
 
                 let correos: any;
 
                 let marcacion: any;
 
                 if (navegacion.customData) {
-console.log('entro a data navegación');
-
                     marcacion = navegacion.customData.customApps[0].fields.aliados;
                     const correosClientes = navegacion.clientProfileData.email.split('-')
-                
+
                     correos = `["${correosClientes[0]}"]`
                 } else {
 
@@ -249,7 +221,7 @@ console.log('entro a data navegación');
                         let em = new Array();
 
                         datosRecibidos.forEach(datos => {
-                            ir.push({"ir":datos.mar_id})
+                            ir.push({ "ir": datos.mar_id })
                             em.push(datos.mar_correo_cliente)
                         });
 
@@ -261,10 +233,10 @@ console.log('entro a data navegación');
 
 
                 }
-                console.log({marcacion}) 
+
                 if (marcacion) {
 
-                                       
+
 
                     let valorTotal;
                     let flete;
@@ -277,8 +249,10 @@ console.log('entro a data navegación');
                         }
                     })
                     const productos = await navegacion.items.map(item => {
-                        return item.name
+                        return `ref: ${item.refId} - cant: ${item.quantity} - nombre: ${item.name} - valor : $${item.price / 100}`
                     })
+
+                    const metodoPago = navegacion.paymentData.transactions[0].payments[0].paymentSystemName
 
 
                     const venta = {
@@ -289,17 +263,20 @@ console.log('entro a data navegación');
                         valorTotal: valorTotal.toString(),
                         productos,
                         flete: flete.toString(),
-                        correos
+                        correos,
+                        nombreCliente: navegacion.clientProfileData.firstName,
+                        apellidoCliente: navegacion.clientProfileData.lastName,
+                        documentoCliente: navegacion.clientProfileData.document,
+                        medioPago: metodoPago
                     }
 
-                    console.log(venta);
-                    
-                     return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
+
+                    return await axios.post(Env.get('BACKEND') + '/ventas/shopify', venta).then((resultado) => {
                         return resultado.data
                     }).catch((err) => {
                         console.log(err)
                         return err
-                    }) 
+                    })
 
 
                 }

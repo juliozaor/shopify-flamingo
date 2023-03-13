@@ -60,6 +60,8 @@ export default class ControladorCategorias {
 
             return response.stream(await Drive.getStream(ubicacion))
         } catch (error) {
+            console.log(error);
+            
             response.status(400).send("Archivo no encontrado")
         }
 
